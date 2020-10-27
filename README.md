@@ -24,7 +24,8 @@ Praat_Tips_German.pdf
 Still in German! Some tips to make your Praat script faster.
 
 
-BASIC TOOLS
+BASIC TOOLS:
+
 Remove_spaces
 Removes trailing tabs and spaces in Praat scripts.
 Solves one of the annoying problems with them.
@@ -44,7 +45,8 @@ Label
 Interactive supply of text labels for segmenting (labels are supplied from a text file for each interval or point).
 
 
-DURATION
+DURATION:
+
 Duration
 Computes durations of all files or (selected) intervals of all files in a directory.
 
@@ -58,7 +60,8 @@ Intensity_Contour
 Computes intensity contours of all files or for (selected) intervals of all files in a directory.
 
 
-PITCH
+PITCH:
+
 Pitch
 Computes F0 of all files or of (selected) intervals of all files in a directory,
 at the center or edges of intervals, and can compute mean, st.dev., median, quantiles.
@@ -67,7 +70,8 @@ Pitch_Contour
 Computes F0 contours of all files or for (selected) intervals of all files in a directory.
 
 
-FORMANTS
+FORMANTS:
+
 Formants
 Computes formants (optional with bandwidth and amplitude, F0 and intensity) of all files or for (selected) intervals of all files in a directory,
 at the center or edges of intervals, and can compute mean, st.dev., median, quantiles.
@@ -79,12 +83,14 @@ Add_LPC_Spectrum
 Display LPC spectra (as a menu option).
 
 
-SPECTRUM
+SPECTRUM:
+
 Spectrum
 Computes spectral mean, st.dev., skewness and kurtosis of selected intervals in all files of a directory.
 
 
-CSL PERL
+CSL PERL:
+
 csl2praat.pl
 Convert CSL-Tags/Impulses to PRAAT-TextGrids.
 (Written for UNIX/Mac - DOS needs backslashes in the path!)
