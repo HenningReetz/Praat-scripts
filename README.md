@@ -10,6 +10,7 @@ A short descrition of the files will follow shortly (i.e., in the next days or w
 
 
 BEGINNERS:
+
 Praat_in_a_Nutshell_17-12-2015.pdf
 Very basic guide to use Praat - not scripting!
 
