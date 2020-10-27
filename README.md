@@ -87,14 +87,3 @@ SPECTRUM:
 
 Spectrum –
 Computes spectral mean, st.dev., skewness and kurtosis of selected intervals in all files of a directory.
-
-
-CSL PERL:
-
-csl2praat.pl –
-Convert CSL-Tags/Impulses to PRAAT-TextGrids.
-(Written for UNIX/Mac - DOS needs backslashes in the path!)
-
-tags.pl –
-Compute distances/frequencies from CSL-tags/impulses.
-(Works with samples/ms/Hz)
