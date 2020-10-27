@@ -11,16 +11,16 @@ A short descrition of the files will follow shortly (i.e., in the next days or w
 
 BEGINNERS:
 
-Praat_in_a_Nutshell_17-12-2015.pdf
+Praat_in_a_Nutshell_17-12-2015.pdf –
 Very basic guide to use Praat - not scripting!
 
-Praat errors.pdf
+Praat errors.pdf –
 Very few tips on common errors when using Praat (scripts).
 
-Praat_scripts_structure.pdf
+Praat_scripts_structure.pdf –
 Still in German! How I structure my Praat scripts.
 
-Praat_Tips_German.pdf
+Praat_Tips_German.pdf –
 Still in German! Some tips to make your Praat script faster.
 
 
