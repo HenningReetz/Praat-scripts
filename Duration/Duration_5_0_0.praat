@@ -1,9 +1,9 @@
 ##
 #	This script computes the durations of either
 #	(a) all sounds files in a directory or
-#	(b) all labeled intervals of all wav-soundfiles in a directory.
+#	(b) all labeled intervals of all sound files in a directory.
 #
-# **> Please read 'pitch.pdf' for a full description of this rather complex script.
+# **> Please read 'duration_manual.pdf' for a full description of this rather complex script.
 # **> Please feel free to use and modify this script to your needs.
 # **> But please report errors or give suggestions for improvements to <reetz.phonetics@gmail.com>
 #
@@ -34,7 +34,7 @@ space$ = " "
 ## ! Note that 'form' may only be used once in a script!
 #
 
-form Duration parameters:
+form Duration (Vers. 5.0) parameters:
 	comment Leave the directory path empty if you want to use the current directory.
 	word directory
 	comment __________________________________________________________________________________________________
