@@ -48,11 +48,7 @@ Computes intensities of all files or of (selected) intervals of all files in a d
 
 PITCH
 Pitch
-Computes F0 of all files or of (selected) intervals of all files in a directory,
-at the center or edges of intervals, and can compute mean, st.dev., median, quantiles.
-
-Pitch_Contour
-Computes F0 contours of all files or for (selected) intervals of all files in a directory.
+Computes F0 of all files or of (selected) intervals of all files in a directory,, and can report mean, standard deviation, median, quantiles of intervals/files and pitch values at equidistant time points (incl. only at center and/or edges) of intervals/files (e.g. to plot contours with a spreadsheet program of the result data)
 
 
 FORMANTS
