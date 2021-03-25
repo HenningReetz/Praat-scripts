@@ -36,6 +36,8 @@ Generates separate wav-files from labeled intervals.
 Label
 Interactive supply of text labels for segmenting (labels are supplied from a text file for each interval or point).
 
+Hillenbrand2TextGrid
+Convert Hillenbrand et al.'s vowels timimg info into TextGrids
 
 DURATION
 Duration
