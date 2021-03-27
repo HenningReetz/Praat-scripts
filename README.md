@@ -39,6 +39,9 @@ Interactive supply of text labels for segmenting (labels are supplied from a tex
 Hillenbrand2TextGrid
 Convert Hillenbrand et al.'s vowels timimg info into TextGrids
 
+TIMIT2praat
+Convert TIMIT's WAV, phoneme, word and sentece files to Praat's .wav and TextGrids
+
 DURATION
 Duration
 Computes durations of all files or (selected) intervals of all files in a directory or reports times of point tiers.
