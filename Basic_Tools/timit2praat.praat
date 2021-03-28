@@ -19,6 +19,7 @@
 #	Point tier 5 (ptional): "Missing" TIMIT words with zero-length from <file>.WRD
 #
 #	Version 0.0, Henning Reetz, 27-mar-2021	initial hack
+#	Version 0.1, Henning Reetz, 28-mar-2021	fixed following to original directory structure
 #	Tested with PRAAT 6.1.38 on MacOS 11.2.3
 #
 #	(A more detailed description will be in an additional PDF file in thenear furture)
@@ -28,6 +29,7 @@
 
 writeInfo: ""
 
+# TIMIT extensions
 timit_wav$ = ".WAV"
 timit_txt$ = ".TXT"
 timit_phn$ = ".PHN"
@@ -36,13 +38,22 @@ timit_wrd$ = ".WRD"
 # count the nr. of wav fiels to inform user later
 nr_wav = 0
 
+# tier numbers for TextGrid
 phoneme_tier = 1
 sentence_tier = 2
 word_tier = 3
 overlap_tier = 4
 missing_tier = 5
 
-# naming parts variables
+##########################################################################################
+#                  Get user input                                                        #
+##########################################################################################
+
+# The user can define the sequence of naming parts 
+# (g: Gender (optional), d: Dialect region, sp: Speaker, s:Sentence, t: TEST/TRAIN)
+# The naming parts variables here are used to check whether all (other than gender)
+#	are defined at least once (in any sequence)
+# (perhaps there is a more elegant method to text that)
 g = 1
 d = 2
 sp = 3
@@ -50,13 +61,15 @@ s = 4
 t = 5
 max_naming_part = 5
 
+# Inquire the naming sequence for the output files name 
+# (and whether DC-offset should be removed and peak alignment should be performed)
 repeat
 	error = 0
 	beginPause: "TIMIT-to-PRAAT parameters:"
 		comment: "Leave the field empty if you want to leave audio and TextGrid files in the" 
-		comment: "Original TIMIT directory structure or specify a string to copy all new"
+		comment: "original TIMIT directory structure or specify a string to copy all new"
 		comment: ".wav and .TextGrid files into a subdirectory 'praat'"
-		comment: "Use letters separated by spaces to define the naming convention:"
+		comment: "Use letters separated by spaces or commas to define the naming convention:"
 		comment: "T: test/train, D: dialect region, G: gender, Sp: speaker, S: sentence type. E.g."
 		comment: "G D S Sp T will generate names like M_DR1_SA1_MFAKS0_TEST.wav"
 		comment: "S G T D Sp will generate names like SA1_M_TEST_DR1_MFAKS0.wav"
@@ -73,45 +86,48 @@ repeat
 		exit Script aborted by user.
 	endif
 
-# if the naming field is empty, put files into original directories
-#@@ should I check in that case whether lower case .wav files are there??
+# convert 'naming_sequence' to lowercase, separating commas and create a token object
+# (this object will be used to generate the individual names later)
 naming_sequence$ = replace_regex$ (naming_sequence$, ".", "\L&", 0)
 naming_sequence$= replace_regex$ (naming_sequence$, " ", ",", 0)
 naming_obj = Create Strings as tokens: naming_sequence$, " ,"
 nr_naming_parts = Get number of strings
 
-if (nr_naming_parts = 0)
-	wav_directory$ = ""
+# use './praat/' directory for all files and create pattern for file name
+	if (nr_naming_parts)
 
-# use local directory for all files and create pattern for file name
-# check naming parameters field (convert to lower case and change spaces to commas first)
-else
+# go thru input and check whether all parts are there (gender can be missing)
+		for i_part to max_naming_part
+			part[i_part] = 0
+		endfor
+		for i_part to nr_naming_parts
+			part$ = Get string: i_part
+			part['part$'] += 1
+		endfor
 
-# go thru input and check whether all are there (gender can be missing)
-	for i_part to max_naming_part
-		part[i_part] = 0
-	endfor
-	for i_part to nr_naming_parts
-		part$ = Get string: i_part
-		part['part$'] += 1
-	endfor
+		for i_part from d to max_naming_part
+			if (part[i_part] <> 1)
+				writeInfo: "Error: D S Sp T must appear exactly once (in any sequencing).
+				error = 1
+			endif
+		endfor
 
-	for i_part from d to max_naming_part
-		if (part[i_part] <> 1)
-			writeInfo: "Error: D S Sp T must appear exactly once (in any sequencing).
-			error = 1
+# everything is OK create subdirectory
+		if (!error)
+			wav_directory$ = "./praat/"
+			createDirectory: wav_directory$
 		endif
-	endfor
 
-# everyting is OK
-	if (!error)
-		wav_directory$ = "./praat/"
-		createDirectory: wav_directory$
+# if the naming field is empty, put files into original directories
+#@@ should I check in that case whether lower case .wav files are there??
+	else
+		wav_directory$ = ""
 	endif
-endif
 
+# loop thru input dialog until name sequence is okay
 until (!error)
-			
+
+# create warning files	
 sep$ = tab$
 report_overlap_file$ = "TIMIT_overlaps.txt"
 report_missing_file$ = "TIMIT_missing.txt"
@@ -129,14 +145,14 @@ nr_missing = 0
 # start with the present directory
 dir_name$ = "./"
 
-# nr. of entry in the directory listing
+# nr. of entries in the directory listing
 nr_dir_list = 1
 
 # pointer to the nth directory inserted
 now_dir_pnt = 0
 
 # create a table for the directories and insert the present directory in it
-table_obj = Create Table with column names: "dir_table", nr_dir_list, "directory"
+dir_list_obj = Create Table with column names: "dir_table", nr_dir_list, "directory"
 Set string value: nr_dir_list, "directory", dir_name$
 
 # Get all directories. We use a table of directroy names and add new names to it.
@@ -144,9 +160,9 @@ Set string value: nr_dir_list, "directory", dir_name$
 # this will contiue continue as long as 'now_dir_pnt' has not reached 'nr_dir_list'
 repeat
 	now_dir_pnt += 1
-	selectObject: table_obj
+	selectObject: dir_list_obj
 
-# get the name of the present directory (i.e. the 'now_fir_pnt' directory
+# get the name of the present directory (i.e. the 'now_dir_pnt' directory
 	dir_name$ = Get value: 'now_dir_pnt', "directory"
 
 # Create a new list of all sub-directories of the directory to which 'now_dir_pnt' points
@@ -165,7 +181,7 @@ repeat
 		new_dir_name$ = dir_name$+new_dir_name$+"/"
 
 # add the new directory name to the table of directory names
-		selectObject: table_obj
+		selectObject: dir_list_obj
 		Append row
 		nr_dir_list += 1
 		Set string value: 'nr_dir_list', "directory", "'new_dir_name$'"
@@ -175,10 +191,12 @@ repeat
 
 # clean up list of 'now_dir_pnt' directories
 	removeObject: string_obj
+
+# do this until search is exhausted
 until (now_dir_pnt >= nr_dir_list)
 
 # now remove all paths that are too short (i.e. not pointing to sound files)
-selectObject: table_obj
+selectObject: dir_list_obj
 for i_row to nr_dir_list
 	directory$ = Get value: i_dir, "directory"
 	if (length(directory$)<17)
@@ -214,9 +232,8 @@ for i_dir to nr_dir_list
 		last_seconds = seconds
 	endif
 
-
-# get a list of all WAV files i a directory
-	selectObject: table_obj
+# get a list of all WAV files in a directory
+	selectObject: dir_list_obj
 	timit_directory$ = Get value: i_dir, "directory"
 	wav_list_obj = Create Strings as file list...  file_list 'timit_directory$'*'timit_wav$'
 	nr_wav_files = Get number of strings
@@ -230,41 +247,48 @@ for i_dir to nr_dir_list
 		file$ = timit_directory$+wav_name$
 		wav_obj = Read from file: file$
 		rate = Get sampling frequency
-		sample_dur = 1/rate
 		nr_wav += 1
-		# create basic TextGrid
+
+# create basic TextGrid
 		grid_obj = To TextGrid: "Phonemes Sentence Words", ""
 		nr_tiers = 3
 
-# create output name now already because we might need it for warning/error messages
+# create output name already now because we might need it for warning messages
 # dissemble name into its parts 
-# does PRAAT knows things like \d(.*) 
-		help$ = replace$(file$,timit_wav$,"",1)
-		help$ = replace_regex$(help$,"..","",1)
-		part_t$ = replace_regex$(help$,"/.*","",1)
-		part_d$ = replace_regex$(help$,".*?/","",1)
-		part_d$ = replace_regex$(part_d$,"/.*","",1)
-		part_sp$ = replace_regex$(help$,".*?/","",2)
-		part_sp$ = replace_regex$(part_sp$,"/.*","",1)
-		part_g$ = left$(part_sp$)
-		part_s$ = replace_regex$(help$,".*?/","",3)
+##@@ does PRAAT knows things like "\d(.*)"  ??
+		if (nr_naming_parts)
+			help$ = replace$(file$,timit_wav$,"",1)
+			help$ = replace_regex$(help$,"..","",1)
+			part_t$ = replace_regex$(help$,"/.*","",1)
+			part_d$ = replace_regex$(help$,".*?/","",1)
+			part_d$ = replace_regex$(part_d$,"/.*","",1)
+			part_sp$ = replace_regex$(help$,".*?/","",2)
+			part_sp$ = replace_regex$(part_sp$,"/.*","",1)
+			part_g$ = left$(part_sp$)
+			part_s$ = replace_regex$(help$,".*?/","",3)
 
 # now assemble the output names
-		selectObject: naming_obj
-		part$ = Get string: 1
-		out_file$ = part_'part$'$
-		for i_part from 2 to nr_naming_parts
+			selectObject: naming_obj
+			part$ = Get string: 1
+			out_file$ = part_'part$'$
+			for i_part from 2 to nr_naming_parts
 				part$ = Get string: i_part
 				out_file$ += "_"
 				out_file$ += part_'part$'$
-		endfor
+			endfor
+
+# files should be written into original directories
+		else
+			out_file$ = file$
+		endif
 
 # the labeling for sentences, words and phonemes are not exactly the same
 # that's we I do three times 'nearly' the same but have their own peculiarities,
 # and do not use a loop for the 3 levels
 
 ##
-# first put the Sentence into the sentence tier
+# first: put the Sentence into the sentence tier
+# (this is very easy)
 ##
 # the sentence is in a file with the extension .TXT
 		file$ = replace$(file$,timit_wav$,timit_txt$,1)
@@ -278,7 +302,8 @@ for i_dir to nr_dir_list
 		removeObject: label_obj
 
 ##
-# now insert the phonemes (there is no overlap in the phone,es; i.e. they are simpler than words
+# second: insert the phonemes 
+# (there is no overlap in the phonemes; i.e. they are simpler than words)
 ##
 # phonemes are strictly left-to-right in TIMIT, just like in Praat
 		file$ = replace$(file$,timit_txt$,timit_phn$,1)
@@ -293,7 +318,7 @@ for i_dir to nr_dir_list
 			line$ = Get string: i_label
 # get label
 			label$ = replace_regex$(line$,"\d* \d* ","",1)
-# get right boundary (removeirst the 'label$' string, then the 'on' sample number
+# get right boundary (remove first the 'label$' string, then the 'on' sample number
 			off$ = replace_regex$(line$," 'label$'","",1)
 			off$ = replace_regex$(off$,"\d* ","",1)
 # convert the sample nymber in 'off$' into seconds in 'off'
@@ -307,9 +332,10 @@ for i_dir to nr_dir_list
 			endif
 		endfor
 		removeObject: label_obj
-
+##@@@@
 ##
-# now insert the words (there are overlaps and gaps, they need special handling)
+# third: insert the words 
+# (there are overlaps and gaps, they need special handling)
 # This becomes messy now...
 ##
 # put all word labels into tiers
@@ -350,7 +376,7 @@ for i_dir to nr_dir_list
 # now we try to insert the labels
 			selectObject: grid_obj
 # the first label must not start at '0'
-# if that is the case, insert a bouadry (but no label)
+# if that is the case, insert a boundzry (but no label)
 			if (i_label = 1) and (on <> 0)
 				Insert boundary: word_tier, on
 				last_off = on
@@ -438,7 +464,7 @@ label next
 		endfor
 		removeObject: label_obj
 	
-		out_file$ = "'wav_directory$'/'out_file$'.TextGrid"
+		out_file$ = "'wav_directory$''out_file$'.TextGrid"
 		selectObject: grid_obj
 		Save as text file: out_file$
 		Remove
@@ -460,7 +486,7 @@ label next
 
 # going thru all directories
 endfor
-removeObject: table_obj, naming_obj
+removeObject: dir_list_obj, naming_obj
 
 # clean up and inform user
 writeInfoLine: "Done.'newline$''nr_wav' files in 'nr_dir_list' directories processed."
