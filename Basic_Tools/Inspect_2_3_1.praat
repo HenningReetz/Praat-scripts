@@ -27,7 +27,7 @@
 #  	Version 2.1.0, Henning Reetz, 07-jun-2021, added options for judgments and comments, new progress-file format
 #  	Version 2.2.0, Henning Reetz, 07-jul-2021, added options for notes, new progress-file format
 #  	Version 2.3.0, Henning Reetz, 21-oct-2021, commments, notes and judgments file stored in progress file
-#  	Version 2.3.1, Henning Reetz, 26-nov-2021, correct computation of praat version compability
+#  	Version 2.3.1, Henning Reetz, 26-nov-2021, correct computation of praat version compability; ToSoundFile replaced by MakeFileNames
 #
 #	Tested with Praat 6.1.51
 ##
@@ -1034,9 +1034,8 @@ procedure CheckFileField
 			selectObject: file_list_obj
 			for i_line to nr_files
 				line$ = Get string: i_line
-				lc_help$ = replace_regex$ (line$, ".", "\L&", 0)
 # create a full name (with path and extension if missing)
-				call ToSoundFile line$
+				call MakeFileNames 'line$'
 				if (not fileReadable(sound_file$))
 					printline The file "'files$'" seems not to contain a list of sound file names.
 					printline Please correct the input or the file format.
