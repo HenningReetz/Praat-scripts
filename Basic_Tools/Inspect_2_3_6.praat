@@ -76,7 +76,7 @@ call GetDateTime
 support_directory$ = ""
 
 # extension for the sound files
-sound_ext$ = ".WAV"
+sound_ext$ = ".wav"
 
 # parameters that are inquired if no progress_file$ has been found
 files$ = ""
@@ -566,8 +566,8 @@ label next_sound_file
 		exit
 	endif
 	writeInfo: "All 'nr_files' files scanned."
-	removeObject: file_list_obj
-	file_list_obj = 0
+#	removeObject: file_list_obj
+#	file_list_obj = 0
 
 
 ###
